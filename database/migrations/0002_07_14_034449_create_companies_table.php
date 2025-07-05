@@ -14,16 +14,19 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('logo')->nullable();
             $table->string('website')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
-            $table->text('description')->nullable(); 
-            $table->text('vision')->nullable();
-            $table->text('mission')->nullable();
-            $table->text('values')->nullable();
-            $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+            $table->string('phone', 15)->nullable();
+            $table->string('extension', 10)->nullable();
+            $table->string('email', 255)->nullable();
+            $table->text('description', 65535)->nullable(); 
+            $table->text('vision', 65535)->nullable();
+            $table->text('mission', 65535)->nullable();
+            $table->text('values', 65535)->nullable();
+            $table->foreignId('locations_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
