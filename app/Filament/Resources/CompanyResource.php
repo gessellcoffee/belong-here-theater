@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaUpload;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Filament\Resources\CompanyResource\RelationManagers;
 use App\Filament\Traits\HasMediaResource;
@@ -37,10 +38,10 @@ class CompanyResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('user_id')
-                            ->relationship('requested_by_user', 'name')
+                            ->relationship('user', 'name')
                             ->required()
                             ->label('Owner/Creator'),
-                        Forms\Components\Select::make('location_id')
+                        Forms\Components\Select::make('locations_id')
                             ->relationship('locations', 'name')
                             ->label('Location')
                             ->createOptionForm([
@@ -81,7 +82,7 @@ class CompanyResource extends Resource
                         Forms\Components\FileUpload::make('logo')
                             ->image()
                             ->directory('company-logos')
-                            ->maxSize(1024)
+                            ->maxSize(300000)
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('1:1')
                             ->imageResizeTargetWidth('300')
@@ -105,101 +106,23 @@ class CompanyResource extends Resource
                     ])->columns(1),
                 Forms\Components\Section::make('Media Files')
                     ->schema([
-                        Forms\Components\FileUpload::make('media_logos')
-                            ->label('Company Logos')
-                            ->multiple()
-                            ->maxFiles(5)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
-                            ->directory('company-logos')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'logos');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
                             
-                        Forms\Components\FileUpload::make('media_photos')
-                            ->label('Company Photos')
-                            ->multiple()
-                            ->maxFiles(10)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
-                            ->directory('company-photos')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'photos');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
+                        MediaUpload::photos(
+                            name: 'media_photos',
+                            label: 'Company Photos',
+                            collection: 'photos',
+                            directory: 'company-photos',
+                            maxFiles: 10
+                        ),
                             
-                        Forms\Components\FileUpload::make('media_documents')
-                            ->label('Company Documents')
-                            ->multiple()
-                            ->maxFiles(5)
-                            ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                            ->directory('company-documents')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'documents');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
+                        MediaUpload::documents(
+                            name: 'media_documents',
+                            label: 'Company Documents',
+                            collection: 'documents',
+                            directory: 'company-documents',
+                            maxFiles: 5,
+                            maxSize: 300000 // 292MB max size per file
+                        ),
                     ])
                     ->collapsible(),
             ]);
@@ -249,9 +172,8 @@ class CompanyResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('location')
                     ->relationship('locations', 'name'),
-                Tables\Filters\SelectFilter::make('owner')
-                    ->relationship('requested_by_user', 'name'),
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('user_id')
+                    ->relationship('user', 'name'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

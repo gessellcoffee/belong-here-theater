@@ -9,14 +9,10 @@ use App\Models\Locations;
 use App\Services\GeocoderService;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Hidden;
+use App\Filament\Components\MediaUpload;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -119,69 +115,22 @@ class LocationResource extends Resource
                     ->columns(1),
                 Forms\Components\Section::make('Media Files')
                     ->schema([
-                        Forms\Components\FileUpload::make('media_photos')
-                            ->label('Location Photos')
-                            ->multiple()
-                            ->maxFiles(10)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
-                            ->directory('location-photos')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'photos');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
+                        MediaUpload::photos(
+                            name: 'media_photos',
+                            label: 'Location Photos',
+                            collection: 'photos',
+                            directory: 'location-photos',
+                            maxFiles: 10
+                        ),
                             
-                        Forms\Components\FileUpload::make('media_documents')
-                            ->label('Location Documents')
-                            ->multiple()
-                            ->maxFiles(5)
-                            ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                            ->directory('location-documents')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'documents');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
+                        MediaUpload::documents(
+                            name: 'media_documents',
+                            label: 'Location Documents',
+                            collection: 'documents',
+                            directory: 'location-documents',
+                            maxFiles: 5,
+                            maxSize: 300000 // 292MB max size per file
+                        ),
                     ])
                     ->collapsible(),
             ]);

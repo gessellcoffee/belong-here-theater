@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\MediaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class MediaController extends Controller
@@ -29,6 +30,13 @@ class MediaController extends Controller
      */
     public function upload(Request $request)
     {
+        // Log that we've entered the upload method
+        Log::info('MediaController: upload method called', [
+            'request_data' => $request->except(['file']),
+            'has_file' => $request->hasFile('file'),
+            'user_id' => Auth::id()
+        ]);
+        
         $validator = Validator::make($request->all(), [
             'file' => 'required|file|max:10240', // 10MB max
             'model_type' => 'required|string|in:user,company,location',
@@ -37,21 +45,45 @@ class MediaController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::warning('MediaController: validation failed', [
+                'errors' => $validator->errors()->toArray()
+            ]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
         try {
+            Log::info('MediaController: getting model', [
+                'model_type' => $request->model_type,
+                'model_id' => $request->model_id
+            ]);
+            
             $model = $this->getModel($request->model_type, $request->model_id);
             
             if (!$model) {
+                Log::warning('MediaController: model not found', [
+                    'model_type' => $request->model_type,
+                    'model_id' => $request->model_id
+                ]);
                 return response()->json(['error' => 'Model not found'], 404);
             }
 
             // Check permissions
+            Log::info('MediaController: checking permissions');
             if (!$this->canUploadMedia($model)) {
+                Log::warning('MediaController: unauthorized upload attempt', [
+                    'user_id' => Auth::id(),
+                    'model_type' => $request->model_type,
+                    'model_id' => $request->model_id
+                ]);
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
+            Log::info('MediaController: calling mediaService->uploadMedia', [
+                'model_type' => get_class($model),
+                'model_id' => $model->getKey(),
+                'collection_name' => $request->collection_name
+            ]);
+            
             $media = $this->mediaService->uploadMedia(
                 $model,
                 $request->file('file'),
@@ -59,6 +91,11 @@ class MediaController extends Controller
                 $request->input('custom_properties', [])
             );
 
+            Log::info('MediaController: media uploaded successfully', [
+                'media_id' => $media->id,
+                'file_name' => $media->file_name
+            ]);
+            
             return response()->json([
                 'message' => 'Media uploaded successfully',
                 'media' => [
@@ -70,6 +107,12 @@ class MediaController extends Controller
                 ]
             ], 201);
         } catch (\Exception $e) {
+            Log::error('MediaController: exception during upload', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'model_type' => $request->model_type ?? null,
+                'model_id' => $request->model_id ?? null
+            ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

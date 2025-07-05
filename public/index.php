@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
+// Increase PHP execution time limit to 120 seconds
+set_time_limit(120);
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...

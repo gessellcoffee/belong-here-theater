@@ -33,7 +33,6 @@ class EditUser extends EditRecord
                         ->success()
                         ->send();
                 }),
-                
             Actions\Action::make('unverifyEmail')
                 ->label('Unverify Email')
                 ->icon('heroicon-o-x-mark')
@@ -47,12 +46,11 @@ class EditUser extends EditRecord
                     $this->record->email_verified_at = null;
                     $this->record->save();
                     
-                        Notification::make()
+                    Notification::make()
                         ->title('Email unverified successfully')
                         ->warning()
                         ->send();
                 }),
-                
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),

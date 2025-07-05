@@ -13,6 +13,15 @@ class Company extends Model
         'name',
         'description',
         'logo',
+        'user_id',
+        'location_id',
+        'website',
+        'phone',
+        'extension',
+        'email',
+        'vision',
+        'mission',
+        'values',
     ];
 
     public function users()
@@ -35,14 +44,9 @@ class Company extends Model
         return $this->hasMany(Affiliation::class);
     }   
 
-    public function requested_by_user()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'requested_by_user_id');
-    }
-
-    public function requested_by_company()
-    {
-        return $this->belongsTo(Company::class, 'requested_by_company_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function confirmation_status()

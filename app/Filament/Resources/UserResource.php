@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Components\MediaUpload;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Filament\Traits\HasMediaResource;
@@ -86,72 +87,23 @@ class UserResource extends Resource
                     ])->columns(2),
                 Forms\Components\Section::make('Media Files')
                     ->schema([
-                        Forms\Components\FileUpload::make('media_avatars')
-                            ->label('Profile Pictures')
-                            ->maxFiles(1)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
-                            ->directory('user-avatars')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                // Clear previous avatars when uploading a new one
-                                if ($record) {
-                                    $record->clearMediaCollection('avatars');
-                                    
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'avatars');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
+                        MediaUpload::photos(
+                            name: 'media_avatars',
+                            label: 'Profile Pictures',
+                            collection: 'avatars',
+                            directory: 'user-avatars',
+                            maxFiles: 1,
+                        ),
                             
-                        Forms\Components\FileUpload::make('media_documents')
-                            ->label('User Documents')
-                            ->multiple()
-                            ->maxFiles(5)
-                            ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                            ->directory('user-documents')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'documents');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
-                    ])
+                        MediaUpload::documents(
+                            name: 'media_documents',
+                            label: 'User Documents',
+                            collection: 'documents',
+                            directory: 'user-documents',
+                            maxFiles: 5,
+                            maxSize: 300000 // 292MB max size per file
+                        ),
+                    ])  
                     ->collapsible(),
             ]);
     }

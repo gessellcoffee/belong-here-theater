@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('extension', 10)->nullable();
             $table->string('email', 255)->nullable();
             $table->text('description', 65535)->nullable(); 
-            $table->text('vision', 65535)->nullable();
+            $table->text('vision', 65535)->nullable();  
             $table->text('mission', 65535)->nullable();
-            $table->text('values', 65535)->nullable();
-            $table->foreignId('locations_id')->constrained()->cascadeOnDelete();
+            $table->text('values', 65535)->nullable();  
+            $table->foreignId('locations_id')->nullable()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
