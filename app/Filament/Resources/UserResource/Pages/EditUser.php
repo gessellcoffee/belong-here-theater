@@ -3,9 +3,8 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use Filament\Notifications\Notification;
-
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
@@ -27,13 +26,13 @@ class EditUser extends EditRecord
                 ->action(function () {
                     $this->record->email_verified_at = now();
                     $this->record->save();
-                    
+
                     Notification::make()
                         ->title('Email verified successfully')
                         ->success()
                         ->send();
                 }),
-                
+
             Actions\Action::make('unverifyEmail')
                 ->label('Unverify Email')
                 ->icon('heroicon-o-x-mark')
@@ -46,13 +45,13 @@ class EditUser extends EditRecord
                 ->action(function () {
                     $this->record->email_verified_at = null;
                     $this->record->save();
-                    
-                        Notification::make()
+
+                    Notification::make()
                         ->title('Email unverified successfully')
                         ->warning()
                         ->send();
                 }),
-                
+
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
             Actions\RestoreAction::make(),

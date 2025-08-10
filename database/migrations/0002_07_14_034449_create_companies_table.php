@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('phone', 15)->nullable();
             $table->string('extension', 10)->nullable();
             $table->string('email', 255)->nullable();
-            $table->text('description', 65535)->nullable(); 
+            $table->text('description', 65535)->nullable();
             $table->text('vision', 65535)->nullable();
             $table->text('mission', 65535)->nullable();
             $table->text('values', 65535)->nullable();

@@ -8,11 +8,10 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UsersRelationManager extends RelationManager
 {
-    protected static string $relationship = 'users';
+    protected static string $relationship = 'user';
 
     public function form(Form $form): Form
     {
@@ -28,10 +27,12 @@ class UsersRelationManager extends RelationManager
                 Forms\Components\Placeholder::make('email_verified_status')
                     ->label('Email Verification Status')
                     ->content(function ($record) {
-                        if (!$record) return 'Email will not be verified on creation';
-                        
+                        if (! $record) {
+                            return 'Email will not be verified on creation';
+                        }
+
                         if ($record->email_verified_at) {
-                            return '✅ Verified on ' . date('F j, Y, g:i a', strtotime($record->email_verified_at));
+                            return '✅ Verified on '.date('F j, Y, g:i a', strtotime($record->email_verified_at));
                         } else {
                             return '❌ Not Verified';
                         }
@@ -67,7 +68,7 @@ class UsersRelationManager extends RelationManager
                     ->queries(
                         true: fn (Builder $query) => $query->withTrashed(),
                         false: fn (Builder $query) => $query,
-                        trashed: fn (Builder $query) => $query->onlyTrashed(),
+//                        trashed: fn (Builder $query) => $query->onlyTrashed(),
                     ),
                 Tables\Filters\Filter::make('verified')
                     ->label('Email Verified')

@@ -4,7 +4,7 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\CompanyResource;
 use App\Models\Company;
-use App\Models\Locations;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -14,7 +14,7 @@ class CompanyResourceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->actingAs(User::factory()->create());
@@ -38,7 +38,7 @@ class CompanyResourceTest extends TestCase
     public function can_create_company()
     {
         $user = User::factory()->create();
-        $location = Locations::create([
+        $location = Location::create([
             'name' => 'Test Location',
             'address' => '123 Test St',
             'city' => 'Test City',
@@ -83,7 +83,7 @@ class CompanyResourceTest extends TestCase
         $company = Company::create([
             'name' => 'Test Company',
             'user_id' => User::factory()->create()->id,
-            'location_id' => Locations::create(['name' => 'Test Location'])->id,
+            'location_id' => Location::create(['name' => 'Test Location'])->id,
         ]);
 
         Livewire::test(CompanyResource\Pages\EditCompany::class, [
@@ -97,7 +97,7 @@ class CompanyResourceTest extends TestCase
         $company = Company::create([
             'name' => 'Test Company',
             'user_id' => User::factory()->create()->id,
-            'location_id' => Locations::create(['name' => 'Test Location'])->id,
+            'location_id' => Location::create(['name' => 'Test Location'])->id,
         ]);
 
         $newUser = User::factory()->create();
@@ -136,7 +136,7 @@ class CompanyResourceTest extends TestCase
         $company = Company::create([
             'name' => 'Test Company',
             'user_id' => User::factory()->create()->id,
-            'location_id' => Locations::create(['name' => 'Test Location'])->id,
+            'location_id' => Location::create(['name' => 'Test Location'])->id,
         ]);
 
         Livewire::test(CompanyResource\Pages\ViewCompany::class, [
@@ -150,7 +150,7 @@ class CompanyResourceTest extends TestCase
         $company = Company::create([
             'name' => 'Test Company',
             'user_id' => User::factory()->create()->id,
-            'location_id' => Locations::create(['name' => 'Test Location'])->id,
+            'location_id' => Location::create(['name' => 'Test Location'])->id,
         ]);
 
         Livewire::test(CompanyResource\Pages\EditCompany::class, [
@@ -169,7 +169,7 @@ class CompanyResourceTest extends TestCase
         $company = Company::create([
             'name' => 'Test Company',
             'user_id' => User::factory()->create()->id,
-            'location_id' => Locations::create(['name' => 'Test Location'])->id,
+            'location_id' => Location::create(['name' => 'Test Location'])->id,
         ]);
         $company->delete();
 
@@ -190,7 +190,7 @@ class CompanyResourceTest extends TestCase
         $company = Company::create([
             'name' => 'Test Company',
             'user_id' => User::factory()->create()->id,
-            'location_id' => Locations::create(['name' => 'Test Location'])->id,
+            'location_id' => Location::create(['name' => 'Test Location'])->id,
         ]);
         $company->delete();
 

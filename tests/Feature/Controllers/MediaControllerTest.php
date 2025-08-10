@@ -3,8 +3,7 @@
 namespace Tests\Feature\Controllers;
 
 use App\Models\Company;
-use App\Models\Locations;
-use App\Models\Media;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -80,7 +79,7 @@ class MediaControllerTest extends TestCase
         $user = User::factory()->create();
         $company = Company::factory()->create();
         $company->users()->attach($user->id);
-        
+
         $file = UploadedFile::fake()->image('logo.png');
 
         $response = $this->actingAs($user)
@@ -103,10 +102,10 @@ class MediaControllerTest extends TestCase
     public function test_user_can_upload_media_to_location()
     {
         $user = User::factory()->create();
-        $location = Locations::factory()->create();
+        $location = Location::factory()->create();
         $company = Company::factory()->create(['locations_id' => $location->id]);
         $company->users()->attach($user->id);
-        
+
         $file = UploadedFile::fake()->image('location.jpg');
 
         $response = $this->actingAs($user)
@@ -121,7 +120,7 @@ class MediaControllerTest extends TestCase
 
         $this->assertDatabaseHas('media', [
             'mediable_id' => $location->id,
-            'mediable_type' => Locations::class,
+            'mediable_type' => Location::class,
             'collection_name' => 'photos',
         ]);
     }
@@ -131,12 +130,12 @@ class MediaControllerTest extends TestCase
         $user = User::factory()->create();
         $file1 = UploadedFile::fake()->image('avatar1.jpg');
         $file2 = UploadedFile::fake()->image('avatar2.jpg');
-        
+
         $media1 = $user->addMedia($file1, 'avatars');
         $media2 = $user->addMedia($file2, 'avatars');
 
         $response = $this->actingAs($user)
-            ->getJson('/api/media?model_type=user&model_id=' . $user->id);
+            ->getJson('/api/media?model_type=user&model_id='.$user->id);
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'media')
@@ -159,12 +158,12 @@ class MediaControllerTest extends TestCase
         $user = User::factory()->create();
         $file1 = UploadedFile::fake()->image('avatar.jpg');
         $file2 = UploadedFile::fake()->image('document.pdf');
-        
+
         $user->addMedia($file1, 'avatars');
         $user->addMedia($file2, 'documents');
 
         $response = $this->actingAs($user)
-            ->getJson('/api/media?model_type=user&model_id=' . $user->id . '&collection_name=avatars');
+            ->getJson('/api/media?model_type=user&model_id='.$user->id.'&collection_name=avatars');
 
         $response->assertStatus(200)
             ->assertJsonCount(1, 'media');
@@ -177,7 +176,7 @@ class MediaControllerTest extends TestCase
         $media = $user->addMedia($file, 'avatars');
 
         $response = $this->actingAs($user)
-            ->deleteJson('/api/media/' . $media->id);
+            ->deleteJson('/api/media/'.$media->id);
 
         $response->assertStatus(200);
         $this->assertSoftDeleted('media', ['id' => $media->id]);
@@ -191,7 +190,7 @@ class MediaControllerTest extends TestCase
         $media = $user2->addMedia($file, 'avatars');
 
         $response = $this->actingAs($user1)
-            ->deleteJson('/api/media/' . $media->id);
+            ->deleteJson('/api/media/'.$media->id);
 
         $response->assertStatus(403);
         $this->assertDatabaseHas('media', ['id' => $media->id, 'deleted_at' => null]);

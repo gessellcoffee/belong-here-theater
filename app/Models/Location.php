@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
-use App\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Locations extends Model
+class Location extends Model implements HasMedia
 {
-    use SoftDeletes, HasMedia;
-    
+    use InteractsWithMedia;
+    use SoftDeletes;
+
     protected $table = 'locations';
-    
+
     protected $fillable = [
         'name',
         'address',
@@ -22,9 +25,9 @@ class Locations extends Model
         'latitude',
         'longitude',
     ];
-    
-    public function companies()
+
+    public function companies(): HasMany
     {
-        return $this->hasMany(Company::class, 'location_id');
+        return $this->hasMany(Company::class);
     }
 }

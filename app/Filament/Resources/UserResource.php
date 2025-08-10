@@ -3,12 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Filament\Traits\HasMediaResource;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,14 +16,15 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserResource extends Resource
 {
     use HasMediaResource;
+
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    
+
     protected static ?string $navigationGroup = 'User Management';
-    
+
     protected static ?string $recordTitleAttribute = 'name';
-    
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -51,16 +50,18 @@ class UserResource extends Resource
                         Forms\Components\Placeholder::make('email_verified_status')
                             ->label('Email Verification Status')
                             ->content(function (?string $state, $record) {
-                                if (!$record) return 'Email will not be verified on creation';
-                                
+                                if (! $record) {
+                                    return 'Email will not be verified on creation';
+                                }
+
                                 if ($record->email_verified_at) {
-                                    return '✅ Verified on ' . date('F j, Y, g:i a', strtotime($record->email_verified_at));
+                                    return '✅ Verified on '.date('F j, Y, g:i a', strtotime($record->email_verified_at));
                                 } else {
                                     return '❌ Not Verified';
                                 }
                             }),
                     ])->columns(2),
-                    
+
                 Forms\Components\Section::make('Password')
                     ->schema([
                         Forms\Components\TextInput::make('password')
@@ -96,14 +97,14 @@ class UserResource extends Resource
                                 // Clear previous avatars when uploading a new one
                                 if ($record) {
                                     $record->clearMediaCollection('avatars');
-                                    
+
                                     // Create a proper UploadedFile instance
                                     $tempPath = $file->getRealPath();
                                     $originalName = $file->getClientOriginalName();
                                     $mimeType = $file->getMimeType();
                                     $error = null;
                                     $test = true;
-                                    
+
                                     $uploadedFile = new \Illuminate\Http\UploadedFile(
                                         $tempPath,
                                         $originalName,
@@ -111,15 +112,16 @@ class UserResource extends Resource
                                         $error,
                                         $test
                                     );
-                                    
+
                                     // Add the media and return the path for Filament
                                     $media = $record->addMedia($uploadedFile, 'avatars');
+
                                     return $media->file_path;
                                 }
-                                
+
                                 return null;
                             }),
-                            
+
                         Forms\Components\FileUpload::make('media_documents')
                             ->label('User Documents')
                             ->multiple()
@@ -135,7 +137,7 @@ class UserResource extends Resource
                                     $mimeType = $file->getMimeType();
                                     $error = null;
                                     $test = true;
-                                    
+
                                     $uploadedFile = new \Illuminate\Http\UploadedFile(
                                         $tempPath,
                                         $originalName,
@@ -143,12 +145,13 @@ class UserResource extends Resource
                                         $error,
                                         $test
                                     );
-                                    
+
                                     // Add the media and return the path for Filament
                                     $media = $record->addMedia($uploadedFile, 'documents');
+
                                     return $media->file_path;
                                 }
-                                
+
                                 return null;
                             }),
                     ])

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Company;
-use App\Models\Locations;
+use App\Models\Location;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -38,7 +38,7 @@ class CompanyFactory extends Factory
             'mission' => $this->faker->paragraph(),
             'values' => $this->faker->paragraph(),
             'user_id' => User::factory(),
-            'locations_id' => Locations::factory(),
+            'locations_id' => Location::factory(),
         ];
     }
 }
