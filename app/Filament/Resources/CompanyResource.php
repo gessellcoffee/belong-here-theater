@@ -7,6 +7,7 @@ use App\Filament\Resources\CompanyResource\RelationManagers;
 use App\Filament\Traits\HasMediaResource;
 use App\Models\Company;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -17,14 +18,15 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class CompanyResource extends Resource
 {
     use HasMediaResource;
+
     protected static ?string $model = Company::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
-    
+
     protected static ?string $navigationGroup = 'Company Management';
-    
+
     protected static ?string $recordTitleAttribute = 'name';
-    
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
@@ -37,11 +39,11 @@ class CompanyResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('user_id')
-                            ->relationship('requested_by_user', 'name')
+                            ->relationship('user', 'name')
                             ->required()
                             ->label('Owner/Creator'),
                         Forms\Components\Select::make('location_id')
-                            ->relationship('locations', 'name')
+                            ->relationship('location', 'name')
                             ->label('Location')
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('name')
@@ -59,7 +61,7 @@ class CompanyResource extends Resource
                                     ->maxLength(100),
                             ]),
                     ])->columns(2),
-                    
+
                 Forms\Components\Section::make('Contact Information')
                     ->schema([
                         Forms\Components\TextInput::make('website')
@@ -75,22 +77,32 @@ class CompanyResource extends Resource
                             ->email()
                             ->maxLength(255),
                     ])->columns(2),
-                    
+
                 Forms\Components\Section::make('Company Profile')
                     ->schema([
-                        Forms\Components\FileUpload::make('logo')
-                            ->image()
-                            ->directory('company-logos')
-                            ->maxSize(1024)
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('1:1')
-                            ->imageResizeTargetWidth('300')
-                            ->imageResizeTargetHeight('300'),
+                        SpatieMediaLibraryFileUpload::make('company_logo')
+                            ->label('Company Logo')
+                            ->image()                       // enables preview & client-side image checks
+                            ->acceptedFileTypes([
+                                'image/jpeg', 'image/png', 'image/gif',
+                            ])
+                            // ->disk('s3')                 // uncomment if you store media on S3
+                            // ->visibility('public')       // for S3/public disks; Spatie respects disk visibility
+                            ->downloadable()                // show download button in the UI
+                            ->preserveFilenames(),
+//                        Forms\Components\FileUpload::make('logo')
+//                            ->image()
+//                            ->directory('company-logos')
+//                            ->maxSize(1024)
+//                            ->imageResizeMode('cover')
+//                            ->imageCropAspectRatio('1:1')
+//                            ->imageResizeTargetWidth('300')
+//                            ->imageResizeTargetHeight('300'),
                         Forms\Components\Textarea::make('description')
                             ->rows(3)
                             ->maxLength(65535),
                     ])->columns(2),
-                    
+
                 Forms\Components\Section::make('Company Values')
                     ->schema([
                         Forms\Components\Textarea::make('vision')
@@ -120,7 +132,7 @@ class CompanyResource extends Resource
                                     $mimeType = $file->getMimeType();
                                     $error = null;
                                     $test = true;
-                                    
+
                                     $uploadedFile = new \Illuminate\Http\UploadedFile(
                                         $tempPath,
                                         $originalName,
@@ -128,47 +140,64 @@ class CompanyResource extends Resource
                                         $error,
                                         $test
                                     );
-                                    
+
                                     // Add the media and return the path for Filament
                                     $media = $record->addMedia($uploadedFile, 'logos');
+
                                     return $media->file_path;
                                 }
-                                
+
                                 return null;
                             }),
-                            
-                        Forms\Components\FileUpload::make('media_photos')
+
+                        SpatieMediaLibraryFileUpload::make('media_photos')
                             ->label('Company Photos')
+                            ->collection('company_photos')
                             ->multiple()
+                            ->reorderable()
                             ->maxFiles(10)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
-                            ->directory('company-photos')
-                            ->visibility('public')
-                            ->saveUploadedFileUsing(function ($file, $record) {
-                                if ($record) {
-                                    // Create a proper UploadedFile instance
-                                    $tempPath = $file->getRealPath();
-                                    $originalName = $file->getClientOriginalName();
-                                    $mimeType = $file->getMimeType();
-                                    $error = null;
-                                    $test = true;
-                                    
-                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
-                                        $tempPath,
-                                        $originalName,
-                                        $mimeType,
-                                        $error,
-                                        $test
-                                    );
-                                    
-                                    // Add the media and return the path for Filament
-                                    $media = $record->addMedia($uploadedFile, 'photos');
-                                    return $media->file_path;
-                                }
-                                
-                                return null;
-                            }),
-                            
+                            ->image()                       // enables preview & client-side image checks
+                            ->acceptedFileTypes([
+                                'image/jpeg', 'image/png', 'image/gif',
+                            ])
+                            // ->disk('s3')                 // uncomment if you store media on S3
+                            // ->visibility('public')       // for S3/public disks; Spatie respects disk visibility
+                            ->downloadable()                // show download button in the UI
+                            ->preserveFilenames(),
+
+//                        Forms\Components\FileUpload::make('media_photos')
+//                            ->label('Company Photos')
+//                            ->multiple()
+//                            ->maxFiles(10)
+//                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
+//                            ->directory('company-photos')
+//                            ->visibility('public')
+//                            ->saveUploadedFileUsing(function ($file, $record) {
+//                                if ($record) {
+//                                    // Create a proper UploadedFile instance
+//                                    $tempPath = $file->getRealPath();
+//                                    $originalName = $file->getClientOriginalName();
+//                                    $mimeType = $file->getMimeType();
+//                                    $error = null;
+//                                    $test = true;
+//
+//                                    $uploadedFile = new \Illuminate\Http\UploadedFile(
+//                                        $tempPath,
+//                                        $originalName,
+//                                        $mimeType,
+//                                        $error,
+//                                        $test
+//                                    );
+//
+//                                    // Add the media and return the path for Filament
+//                                    $media = $record->addMedia($uploadedFile, 'photos');
+//
+//                                    return $media->file_path;
+//                                }
+//
+//                                return null;
+//                            }),
+
                         Forms\Components\FileUpload::make('media_documents')
                             ->label('Company Documents')
                             ->multiple()
@@ -184,7 +213,7 @@ class CompanyResource extends Resource
                                     $mimeType = $file->getMimeType();
                                     $error = null;
                                     $test = true;
-                                    
+
                                     $uploadedFile = new \Illuminate\Http\UploadedFile(
                                         $tempPath,
                                         $originalName,
@@ -192,12 +221,13 @@ class CompanyResource extends Resource
                                         $error,
                                         $test
                                     );
-                                    
+
                                     // Add the media and return the path for Filament
                                     $media = $record->addMedia($uploadedFile, 'documents');
+
                                     return $media->file_path;
                                 }
-                                
+
                                 return null;
                             }),
                     ])
@@ -217,17 +247,17 @@ class CompanyResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-                Tables\Columns\TextColumn::make('requested_by_user.name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->label('Owner')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('locations.name')
+                Tables\Columns\TextColumn::make('location.name')
                     ->label('Location')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('website')
                     ->searchable()
-                    ->url(fn (Company $record): ?string => $record->website ? 'https://' . $record->website : null)
+                    ->url(fn (Company $record): ?string => $record->website ? 'https://'.$record->website : null)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
@@ -248,9 +278,9 @@ class CompanyResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('location')
-                    ->relationship('locations', 'name'),
+                    ->relationship('location', 'name'),
                 Tables\Filters\SelectFilter::make('owner')
-                    ->relationship('requested_by_user', 'name'),
+                    ->relationship('user', 'name'),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
@@ -263,7 +293,7 @@ class CompanyResource extends Resource
                     Tables\Actions\ForceDeleteAction::make()
                         ->label('Delete Permanently')
                         ->requiresConfirmation(),
-                ])
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -294,12 +324,12 @@ class CompanyResource extends Resource
             'view' => Pages\ViewCompany::route('/{record}'),
         ];
     }
-    
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);    
+            ]);
     }
 }

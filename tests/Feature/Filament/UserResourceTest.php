@@ -12,7 +12,7 @@ class UserResourceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->actingAs(User::factory()->create());
@@ -49,11 +49,11 @@ class UserResourceTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-        
+
         $user = User::where('email', 'test@example.com')->first();
         $this->assertNull($user->email_verified_at, 'Email should not be verified by default');
     }
-    
+
     /** @test */
     public function it_can_create_user_with_verified_email()
     {
@@ -72,7 +72,7 @@ class UserResourceTest extends TestCase
             'name' => 'Verified User',
             'email' => 'verified@example.com',
         ]);
-        
+
         $user = User::where('email', 'verified@example.com')->first();
         $this->assertNotNull($user->email_verified_at, 'Email should be verified when verify_email is checked');
     }
@@ -145,7 +145,7 @@ class UserResourceTest extends TestCase
         $user->refresh();
         $this->assertNotNull($user->email_verified_at);
     }
-    
+
     /** @test */
     public function it_can_verify_user_email_from_edit_page()
     {
@@ -186,13 +186,13 @@ class UserResourceTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->get(UserResource::getUrl('edit', ['record' => $user]));
-        
+
         // Ensure the form doesn't contain an input for email_verified_at
         $response->assertDontSee('name="email_verified_at"');
-        
+
         // But does show the verification status placeholder
         $response->assertSee('Email Verification Status');
-        
+
         // Check for the verification status text
         if ($user->email_verified_at) {
             $response->assertSee('Verified on');

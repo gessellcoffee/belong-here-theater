@@ -10,19 +10,19 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewCompany extends ViewRecord
 {
     protected static string $resource = CompanyResource::class;
-    
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\EditAction::make()
                 ->label('Edit Company')
                 ->icon('heroicon-o-pencil-square'),
-            
+
             Actions\DeleteAction::make()
                 ->label('Archive Company'),
-            
+
             Actions\RestoreAction::make(),
-            
+
             Actions\ForceDeleteAction::make()
                 ->label('Delete Permanently')
                 ->requiresConfirmation()
@@ -32,12 +32,12 @@ class ViewCompany extends ViewRecord
                 ->action(function () {
                     $name = $this->record->name;
                     $this->record->forceDelete();
-                    
+
                     Notification::make()
                         ->title("{$name} has been permanently deleted")
                         ->danger()
                         ->send();
-                        
+
                     $this->redirect(CompanyResource::getUrl());
                 }),
         ];

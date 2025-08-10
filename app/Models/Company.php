@@ -2,52 +2,46 @@
 
 namespace App\Models;
 
-use App\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Company extends Model
+class Company extends Model implements HasMedia
 {
-    use SoftDeletes, HasMedia;
+    use InteractsWithMedia;
+    use SoftDeletes;
+
+    protected $table = 'companies';
+
     protected $fillable = [
+        'user_id',
         'name',
         'description',
         'logo',
+        'location_id',
     ];
 
-    public function users()
+//    public function users()
+//    {
+//        return $this->belongsToMany(User::class);
+//    }
+
+    public function location(): BelongsTo
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo(Location::class);
     }
 
-    public function location()
-    {
-        return $this->belongsTo(Location::class, 'location_id');
-    }
-    
-    public function locations()
-    {
-        return $this->belongsTo(Locations::class, 'location_id');
-    }
-
-    public function affiliations()
+    public function affiliations(): HasMany
     {
         return $this->hasMany(Affiliation::class);
-    }   
-
-    public function requested_by_user()
-    {
-        return $this->belongsTo(User::class, 'requested_by_user_id');
     }
 
-    public function requested_by_company()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Company::class, 'requested_by_company_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function confirmation_status()
-    {
-        return $this->belongsTo(AffiliationConfirmation::class);
-    }
-    
 }

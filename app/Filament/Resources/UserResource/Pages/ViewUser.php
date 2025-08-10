@@ -10,14 +10,14 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewUser extends ViewRecord
 {
     protected static string $resource = UserResource::class;
-    
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\EditAction::make()
                 ->label('Edit User')
                 ->icon('heroicon-o-pencil-square'),
-                
+
             Actions\Action::make('verifyEmail')
                 ->label('Verify Email')
                 ->icon('heroicon-o-check-badge')
@@ -30,13 +30,13 @@ class ViewUser extends ViewRecord
                 ->action(function () {
                     $this->record->email_verified_at = now();
                     $this->record->save();
-                    
+
                     Notification::make()
                         ->title('Email verified successfully')
                         ->success()
                         ->send();
                 }),
-                
+
             Actions\Action::make('unverifyEmail')
                 ->label('Unverify Email')
                 ->icon('heroicon-o-x-mark')
@@ -49,7 +49,7 @@ class ViewUser extends ViewRecord
                 ->action(function () {
                     $this->record->email_verified_at = null;
                     $this->record->save();
-                    
+
                     Notification::make()
                         ->title('Email unverified successfully')
                         ->warning()

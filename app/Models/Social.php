@@ -51,8 +51,6 @@ class Social extends Model
 
     /**
      * Determine if the social link belongs to a user.
-     *
-     * @return bool
      */
     public function isUserSocial(): bool
     {
@@ -61,8 +59,6 @@ class Social extends Model
 
     /**
      * Determine if the social link belongs to a company.
-     *
-     * @return bool
      */
     public function isCompanySocial(): bool
     {

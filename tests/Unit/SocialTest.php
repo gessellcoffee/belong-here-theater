@@ -16,13 +16,13 @@ class SocialTest extends TestCase
     public function it_can_belong_to_a_user()
     {
         $user = User::factory()->create();
-        
+
         $social = Social::create([
             'name' => 'Twitter',
             'url' => 'https://twitter.com/username',
             'icon' => 'twitter',
             'user_id' => $user->id,
-            'entity_type' => 'user'
+            'entity_type' => 'user',
         ]);
 
         $this->assertTrue($social->isUserSocial());
@@ -35,13 +35,13 @@ class SocialTest extends TestCase
     public function it_can_belong_to_a_company()
     {
         $company = Company::factory()->create();
-        
+
         $social = Social::create([
             'name' => 'Facebook',
             'url' => 'https://facebook.com/companypage',
             'icon' => 'facebook',
             'company_id' => $company->id,
-            'entity_type' => 'company'
+            'entity_type' => 'company',
         ]);
 
         $this->assertTrue($social->isCompanySocial());
@@ -63,7 +63,7 @@ class SocialTest extends TestCase
             'url' => 'https://linkedin.com/in/username',
             'icon' => 'linkedin',
             'user_id' => $user->id,
-            'entity_type' => 'company' // Mismatch with user_id
+            'entity_type' => 'company', // Mismatch with user_id
         ]);
 
         // Test with company_id but user entity_type
@@ -73,7 +73,7 @@ class SocialTest extends TestCase
             'url' => 'https://instagram.com/companypage',
             'icon' => 'instagram',
             'company_id' => $company->id,
-            'entity_type' => 'user' // Mismatch with company_id
+            'entity_type' => 'user', // Mismatch with company_id
         ]);
     }
 
@@ -86,7 +86,7 @@ class SocialTest extends TestCase
             'name' => 'YouTube',
             'url' => 'https://youtube.com/channel',
             'icon' => 'youtube',
-            'entity_type' => 'user' // No user_id provided
+            'entity_type' => 'user', // No user_id provided
         ]);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Models\Locations;
+use App\Models\Location;
 use App\Models\Media;
 use App\Models\User;
 use App\Services\MediaService;
@@ -24,7 +24,6 @@ class MediaController extends Controller
     /**
      * Upload media for a model.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function upload(Request $request)
@@ -42,13 +41,13 @@ class MediaController extends Controller
 
         try {
             $model = $this->getModel($request->model_type, $request->model_id);
-            
-            if (!$model) {
+
+            if (! $model) {
                 return response()->json(['error' => 'Model not found'], 404);
             }
 
             // Check permissions
-            if (!$this->canUploadMedia($model)) {
+            if (! $this->canUploadMedia($model)) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
@@ -67,7 +66,7 @@ class MediaController extends Controller
                     'url' => $media->url,
                     'mime_type' => $media->mime_type,
                     'collection_name' => $media->collection_name,
-                ]
+                ],
             ], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -77,14 +76,13 @@ class MediaController extends Controller
     /**
      * Delete media.
      *
-     * @param Media $media
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Media $media)
     {
         try {
             // Check permissions
-            if (!$this->canDeleteMedia($media)) {
+            if (! $this->canDeleteMedia($media)) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
@@ -99,7 +97,6 @@ class MediaController extends Controller
     /**
      * Get all media for a model.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
@@ -116,18 +113,18 @@ class MediaController extends Controller
 
         try {
             $model = $this->getModel($request->model_type, $request->model_id);
-            
-            if (!$model) {
+
+            if (! $model) {
                 return response()->json(['error' => 'Model not found'], 404);
             }
 
             // Check permissions
-            if (!$this->canViewMedia($model)) {
+            if (! $this->canViewMedia($model)) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
             $query = $model->media();
-            
+
             if ($request->has('collection_name')) {
                 $query->where('collection_name', $request->collection_name);
             }
@@ -152,8 +149,6 @@ class MediaController extends Controller
     /**
      * Get the model instance based on type and ID.
      *
-     * @param string $modelType
-     * @param int $modelId
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     protected function getModel(string $modelType, int $modelId)
@@ -164,7 +159,7 @@ class MediaController extends Controller
             case 'company':
                 return Company::find($modelId);
             case 'location':
-                return Locations::find($modelId);
+                return Location::find($modelId);
             default:
                 return null;
         }
@@ -173,7 +168,7 @@ class MediaController extends Controller
     /**
      * Check if the authenticated user can upload media to the model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return bool
      */
     protected function canUploadMedia($model)
@@ -197,7 +192,7 @@ class MediaController extends Controller
         }
 
         // Location permissions - this would depend on your business logic
-        if ($model instanceof Locations) {
+        if ($model instanceof Location) {
             // For example, if the user is associated with a company at this location
             return $model->companies()
                 ->whereHas('users', function ($query) use ($user) {
@@ -212,7 +207,6 @@ class MediaController extends Controller
     /**
      * Check if the authenticated user can delete the media.
      *
-     * @param Media $media
      * @return bool
      */
     protected function canDeleteMedia(Media $media)
@@ -236,7 +230,7 @@ class MediaController extends Controller
         }
 
         // Location permissions
-        if ($model instanceof Locations) {
+        if ($model instanceof Location) {
             return $model->companies()
                 ->whereHas('users', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
@@ -250,7 +244,7 @@ class MediaController extends Controller
     /**
      * Check if the authenticated user can view media for the model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return bool
      */
     protected function canViewMedia($model)

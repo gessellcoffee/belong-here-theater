@@ -26,12 +26,13 @@ class MediaFactory extends Factory
      */
     public function definition(): array
     {
-        $fileName = $this->faker->word() . '.jpg';
+        $fileName = $this->faker->word().'.jpg';
+
         return [
             'mediable_id' => User::factory(),
             'mediable_type' => User::class,
             'file_name' => $fileName,
-            'file_path' => 'media/users/1/' . Str::slug($fileName) . '_' . time() . '.jpg',
+            'file_path' => 'media/users/1/'.Str::slug($fileName).'_'.time().'.jpg',
             'mime_type' => 'image/jpeg',
             'disk' => 'public',
             'file_size' => $this->faker->numberBetween(1000, 5000000),
@@ -43,20 +44,20 @@ class MediaFactory extends Factory
     /**
      * Configure the model factory to use a specific mediable model.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Database\Eloquent\Factories\Factory
      */
     public function forModel($model)
     {
         $modelClass = get_class($model);
         $modelType = class_basename($modelClass);
-        $path = 'media/' . Str::plural(Str::snake($modelType)) . '/' . $model->id;
-        
+        $path = 'media/'.Str::plural(Str::snake($modelType)).'/'.$model->id;
+
         return $this->state(function (array $attributes) use ($model, $modelClass, $path) {
             return [
                 'mediable_id' => $model->id,
                 'mediable_type' => $modelClass,
-                'file_path' => $path . '/' . Str::slug($attributes['file_name']) . '_' . time() . '.jpg',
+                'file_path' => $path.'/'.Str::slug($attributes['file_name']).'_'.time().'.jpg',
             ];
         });
     }
