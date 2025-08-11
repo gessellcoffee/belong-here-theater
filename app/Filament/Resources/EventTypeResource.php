@@ -16,15 +16,16 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class EventTypeResource extends Resource
 {
     protected static ?string $model = EventType::class;
+    protected static ?string $navigationGroup = 'Events';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-            public static function form(Form $form): Form
-            {
-                return $form
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('name')
+                    ->required()
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('slug')
