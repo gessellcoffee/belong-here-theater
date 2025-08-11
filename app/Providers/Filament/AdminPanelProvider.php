@@ -28,7 +28,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Yellow,
+                'secondary' => Color::Blue,
+                'tertiary' => Color::Pink,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -40,6 +42,9 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
+            ->brandLogo(fn () => view('filament.components.brand'))
+            ->brandLogoHeight('128px')
+            ->brandName('Belong Here Theater')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
