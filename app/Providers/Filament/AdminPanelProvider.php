@@ -43,7 +43,6 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
             ])
             ->brandLogo(fn () => view('filament.components.brand'))
-            ->brandLogoHeight('128px')
             ->brandName('Belong Here Theater')
             ->middleware([
                 EncryptCookies::class,

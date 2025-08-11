@@ -19,46 +19,58 @@ class EventTypeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
+            public static function form(Form $form): Form
+            {
+                return $form
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
+                        Forms\Components\TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(), 
+                    ]);
+            }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
+            public static function table(Table $table): Table
+            {
+                return $table
+                    ->columns([
+                        Tables\Columns\TextColumn::make('name')
+                            ->searchable(),
 
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListEventTypes::route('/'),
-            'create' => Pages\CreateEventType::route('/create'),
-            'edit' => Pages\EditEventType::route('/{record}/edit'),
-        ];
-    }
-}
+                        Tables\Columns\TextColumn::make('slug')
+                            ->searchable(),
+                    ])
+                    ->filters([
+                        Tables\Filters\SelectFilter::make('name'),
+                    ])
+                    ->actions([
+                        Tables\Actions\EditAction::make(),
+                    ])
+                    ->bulkActions([
+                        Tables\Actions\BulkActionGroup::make([
+                            Tables\Actions\DeleteBulkAction::make(),
+                        ]),
+                    ]);
+            }
+
+            public static function getRelations(): array
+            {
+                return [
+                    
+                ];
+            }
+
+            public static function getPages(): array
+            {
+                return [
+                    'index' => Pages\ListEventTypes::route('/'),
+                    'create' => Pages\CreateEventType::route('/create'),
+                    'edit' => Pages\EditEventType::route('/{record}/edit'),
+                ];
+            }
+        }
+    
