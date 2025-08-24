@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('affiliations', function (Blueprint $table) {
+        Schema::create('event_field_values', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->foreignId('entity_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('event_field_id')->constrained('event_fields')->cascadeOnDelete();
+            $table->text('value')->nullable();
             $table->timestamps();
+            
+            $table->unique(['event_id', 'event_field_id']);
         });
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('affiliations');
+        Schema::dropIfExists('event_field_values');
     }
 };

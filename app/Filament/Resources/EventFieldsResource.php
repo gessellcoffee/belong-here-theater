@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -25,56 +26,68 @@ class EventFieldsResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('event_type_id')
-                    ->relationship('eventType', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('label')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'text' => 'Text',
-                        'number' => 'Number',
-                        'date' => 'Date',
-                        'time' => 'Time',
-                        'datetime' => 'Datetime',
-                        'select' => 'Select',
-                        'checkbox' => 'Checkbox',
-                        'radio' => 'Radio',
-                        'textarea' => 'Textarea',
-                        'file' => 'File',
-                        'image' => 'Image',
-                        'file' => 'File',
-                        'image' => 'Image',
-                        'user' => 'User (Single User)',
-                        'users' => 'Users (Multiple Users)',
-                        'document' => 'Document',
-                        'documents' => 'Documents (Multiple Documents)',
-                        'location' => 'Location',
-                        'locations' => 'Locations (Multiple Locations)',
-                    ])
-                    ->required(),
+                Forms\Components\Section::make('Event Field Configuration')
+                    ->collapsible()
+                    ->schema([
+                        Forms\Components\Select::make('event_type_id')
+                            ->relationship('eventType', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('label')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('type')
+                            ->options([
+                                'text' => 'Text',
+                                'number' => 'Number',
+                                'date' => 'Date',
+                                'time' => 'Time',
+                                'datetime' => 'Datetime',
+                                'select' => 'Select',
+                                'checkbox' => 'Checkbox',
+                                'radio' => 'Radio',
+                                'textarea' => 'Textarea',
+                                'file' => 'File',
+                                'image' => 'Image',
+                                'user' => 'User (Single User)',
+                                'users' => 'Users (Multiple Users)',
+                                'document' => 'Document',
+                                'documents' => 'Documents (Multiple Documents)',
+                                'location' => 'Location',
+                                'locations' => 'Locations (Multiple Locations)',
+                            ])
+                            ->required(),
+                    ]),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('eventType'))
             ->columns([
-                Tables\Columns\TextColumn::make('event_type.name')
-                    ->label('Event Type'),
+                Tables\Columns\TextColumn::make('eventType.name')
+                    ->label('Event Type')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Name'),
+                    ->label('Name')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('label')
-                    ->label('Label'),
+                    ->label('Label')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->label('Type'),
+                    ->label('Type')
+                    ->sortable(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('event_type_id')
+                    ->relationship('eventType', 'name')
+                    ->label('Event Type'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -89,7 +102,7 @@ class EventFieldsResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 

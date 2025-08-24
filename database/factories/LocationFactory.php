@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Location>
  */
-class LocationsFactory extends Factory
+class LocationFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -25,14 +25,14 @@ class LocationsFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company(),
-            'address' => $this->faker->streetAddress(),
-            'city' => $this->faker->city(),
-            'state' => $this->faker->state(),
-            'zip' => $this->faker->postcode(),
-            'country' => $this->faker->country(),
-            'latitude' => $this->faker->latitude(),
-            'longitude' => $this->faker->longitude(),
+            'name' => fake()->company(),
+            'address' => fake()->streetAddress(),
+            'city' => fake()->city(),
+            'state' => fake()->state(),
+            'zip' => fake()->postcode(),
+            'country' => fake()->country(),
+            'latitude' => fake()->latitude(),
+            'longitude' => fake()->longitude(),
         ];
     }
 }

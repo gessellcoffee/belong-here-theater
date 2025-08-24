@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('url');
             $table->string('icon');
-            $table->foreignId('company_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('entity_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->enum('entity_type', ['user', 'company']);
+            $table->enum('entity_type', ['user', 'entity']);
             $table->timestamps();
         });
 
@@ -30,8 +30,8 @@ return new class extends Migration
             FOR EACH ROW
             BEGIN
                 SELECT CASE
-                    WHEN (NEW.entity_type = "user" AND (NEW.user_id IS NULL OR NEW.company_id IS NOT NULL))
-                        OR (NEW.entity_type = "company" AND (NEW.company_id IS NULL OR NEW.user_id IS NOT NULL))
+                    WHEN (NEW.entity_type = "user" AND (NEW.user_id IS NULL OR NEW.entity_id IS NOT NULL))
+                        OR (NEW.entity_type = "entity" AND (NEW.entity_id IS NULL OR NEW.user_id IS NOT NULL))
                     THEN RAISE(ABORT, "Entity type must match the provided ID")
                 END;
             END;
@@ -43,8 +43,8 @@ return new class extends Migration
             FOR EACH ROW
             BEGIN
                 SELECT CASE
-                    WHEN NEW.user_id IS NULL AND NEW.company_id IS NULL
-                    THEN RAISE(ABORT, "Either user_id or company_id must be provided")
+                    WHEN NEW.user_id IS NULL AND NEW.entity_id IS NULL
+                    THEN RAISE(ABORT, "Either user_id or entity_id must be provided")
                 END;
             END;
         ');
@@ -55,8 +55,8 @@ return new class extends Migration
             FOR EACH ROW
             BEGIN
                 SELECT CASE
-                    WHEN (NEW.entity_type = "user" AND (NEW.user_id IS NULL OR NEW.company_id IS NOT NULL))
-                        OR (NEW.entity_type = "company" AND (NEW.company_id IS NULL OR NEW.user_id IS NOT NULL))
+                    WHEN (NEW.entity_type = "user" AND (NEW.user_id IS NULL OR NEW.entity_id IS NOT NULL))
+                        OR (NEW.entity_type = "entity" AND (NEW.entity_id IS NULL OR NEW.user_id IS NOT NULL))
                     THEN RAISE(ABORT, "Entity type must match the provided ID")
                 END;
             END;
@@ -67,8 +67,8 @@ return new class extends Migration
             FOR EACH ROW
             BEGIN
                 SELECT CASE
-                    WHEN NEW.user_id IS NULL AND NEW.company_id IS NULL
-                    THEN RAISE(ABORT, "Either user_id or company_id must be provided")
+                    WHEN NEW.user_id IS NULL AND NEW.entity_id IS NULL
+                    THEN RAISE(ABORT, "Either user_id or entity_id must be provided")
                 END;
             END;
         ');

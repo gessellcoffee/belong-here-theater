@@ -35,8 +35,8 @@ return new class extends Migration
 
             // Add columns for the requesting and confirming entities
             $table->foreignId('requested_by_user_id')->nullable()->constrained('users')->after('confirmation_status');
-            $table->foreignId('requested_by_company_id')->nullable()->constrained('companies')->after('requested_by_user_id');
-            $table->timestamp('confirmed_at')->nullable()->after('requested_by_company_id');
+            $table->foreignId('requested_by_entity_id')->nullable()->constrained('entities')->after('requested_by_user_id');
+            $table->timestamp('confirmed_at')->nullable()->after('requested_by_entity_id');
         });
     }
 
@@ -50,7 +50,7 @@ return new class extends Migration
             $table->dropColumn([
                 'confirmation_status',
                 'requested_by_user_id',
-                'requested_by_company_id',
+                'requested_by_entity_id',
                 'confirmed_at',
             ]);
 

@@ -1,6 +1,6 @@
 # Media Upload System
 
-This document describes the media upload system implemented for the Theater Website application. The system allows for uploading media files (images, documents, etc.) to Users, Companies, and Locations using a unified approach.
+This document describes the media upload system implemented for the Theater Website application. The system allows for uploading media files (images, documents, etc.) to Users, Companies, and Location using a unified approach.
 
 ## Architecture
 
@@ -62,7 +62,7 @@ $company = Company::find(1);
 $media = $company->addMedia($request->file('logo'), 'logos');
 
 // Upload media to a location
-$location = Locations::find(1);
+$location = Location::find(1);
 $media = $location->addMedia($request->file('photo'), 'photos');
 ```
 

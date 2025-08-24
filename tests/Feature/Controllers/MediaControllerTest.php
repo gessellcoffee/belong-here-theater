@@ -103,7 +103,7 @@ class MediaControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $location = Location::factory()->create();
-        $company = Company::factory()->create(['locations_id' => $location->id]);
+        $company = Company::factory()->create(['location_id' => $location->id]);
         $company->users()->attach($user->id);
 
         $file = UploadedFile::fake()->image('location.jpg');

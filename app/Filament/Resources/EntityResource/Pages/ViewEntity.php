@@ -1,33 +1,33 @@
 <?php
 
-namespace App\Filament\Resources\CompanyResource\Pages;
+namespace App\Filament\Resources\EntityResource\Pages;
 
-use App\Filament\Resources\CompanyResource;
+use App\Filament\Resources\EntityResource;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewCompany extends ViewRecord
+class ViewEntity extends ViewRecord
 {
-    protected static string $resource = CompanyResource::class;
+    protected static string $resource = EntityResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\EditAction::make()
-                ->label('Edit Company')
+                ->label('Edit Entity')
                 ->icon('heroicon-o-pencil-square'),
 
             Actions\DeleteAction::make()
-                ->label('Archive Company'),
+                ->label('Archive Entity'),
 
             Actions\RestoreAction::make(),
 
             Actions\ForceDeleteAction::make()
                 ->label('Delete Permanently')
                 ->requiresConfirmation()
-                ->modalHeading('Delete Company Permanently')
-                ->modalDescription('Are you sure you want to permanently delete this company? This action cannot be undone.')
+                ->modalHeading('Delete Entity Permanently')
+                ->modalDescription('Are you sure you want to permanently delete this entity? This action cannot be undone.')
                 ->modalSubmitActionLabel('Yes, Delete Permanently')
                 ->action(function () {
                     $name = $this->record->name;
@@ -38,7 +38,7 @@ class ViewCompany extends ViewRecord
                         ->danger()
                         ->send();
 
-                    $this->redirect(CompanyResource::getUrl());
+                    $this->redirect(EntityResource::getUrl());
                 }),
         ];
     }

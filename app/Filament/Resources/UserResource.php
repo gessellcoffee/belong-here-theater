@@ -12,6 +12,13 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\FileUpload;
+use Illuminate\Support\Facades\Hash;
+use Filament\Notifications\Notification;    
 
 class UserResource extends Resource
 {
@@ -32,6 +39,7 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('User Information')
+                    ->collapsible()
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -63,6 +71,7 @@ class UserResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('Password')
+                    ->collapsible()
                     ->schema([
                         Forms\Components\TextInput::make('password')
                             ->password()
@@ -213,7 +222,7 @@ class UserResource extends Resource
                         ->action(function ($record) {
                             $record->email_verified_at = now();
                             $record->save();
-                            Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Email Verified')
                                 ->success()
                                 ->body('User email has been marked as verified.')
@@ -231,7 +240,7 @@ class UserResource extends Resource
                         ->action(function ($record) {
                             $record->email_verified_at = null;
                             $record->save();
-                            Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Email Unverified')
                                 ->warning()
                                 ->body('User email has been marked as unverified.')

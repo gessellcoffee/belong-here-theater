@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->text('description')->nullable();
             $table->foreignId('event_type_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('entity_id')->constrained()->cascadeOnDelete()->nullable();
             $table->foreignId('location_id')->constrained()->cascadeOnDelete();
+            $table->date('date');
             $table->timestamps();
         });
     }

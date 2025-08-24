@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CompanyResource\Pages;
-use App\Filament\Resources\CompanyResource\RelationManagers;
+use App\Filament\Resources\EntityResource\Pages;
+use App\Filament\Resources\EntityResource\RelationManagers;
 use App\Filament\Traits\HasMediaResource;
-use App\Models\Company;
+use App\Models\Entity;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
@@ -14,30 +14,58 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Select;
 
-class CompanyResource extends Resource
+class EntityResource extends Resource
 {
     use HasMediaResource;
 
-    protected static ?string $model = Company::class;
+    protected static ?string $model = Entity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
-    protected static ?string $navigationGroup = 'Company Management';
+    protected static ?string $navigationGroup = 'Entity Management';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?int $navigationSort = 2;
+
+    /**
+     * Generate dynamic section label based on selected entity type
+     */
+    protected static function getDynamicSectionLabel(callable $get, string $sectionName, string $fallbackPrefix = 'Entity'): string
+    {
+        $entityTypeId = $get('entity_type_id');
+        if ($entityTypeId) {
+            $entityType = \App\Models\EntityType::find($entityTypeId);
+            return $entityType ? $entityType->name . ' ' . $sectionName : $sectionName;
+        }
+        return $fallbackPrefix . ' ' . $sectionName;
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make('Basic Information')
+                    ->collapsible()
                     ->schema([
+                        Forms\Components\Select::make('entity_type_id')
+                            ->relationship('entity_type', 'name')
+                            ->required()
+                            ->label('Entity Type')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                // Clear any cached entity type name when selection changes
+                                $set('_entity_type_name', null);
+                            }),
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(),
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
                             ->required()
@@ -62,7 +90,8 @@ class CompanyResource extends Resource
                             ]),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Contact Information')
+                Forms\Components\Section::make(fn (callable $get) => static::getDynamicSectionLabel($get, 'Contact Information'))
+                    ->collapsible()
                     ->schema([
                         Forms\Components\TextInput::make('website')
                             ->maxLength(255)
@@ -78,10 +107,11 @@ class CompanyResource extends Resource
                             ->maxLength(255),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Company Profile')
+                Forms\Components\Section::make(fn (callable $get) => static::getDynamicSectionLabel($get, 'Profile'))
+                    ->collapsible()
                     ->schema([
-                        SpatieMediaLibraryFileUpload::make('company_logo')
-                            ->label('Company Logo')
+                        SpatieMediaLibraryFileUpload::make('entity_logo')
+                            ->label('Entity Logo')
                             ->image()                       // enables preview & client-side image checks
                             ->acceptedFileTypes([
                                 'image/jpeg', 'image/png', 'image/gif',
@@ -92,7 +122,7 @@ class CompanyResource extends Resource
                             ->preserveFilenames(),
 //                        Forms\Components\FileUpload::make('logo')
 //                            ->image()
-//                            ->directory('company-logos')
+//                            ->directory('entity-logos')
 //                            ->maxSize(1024)
 //                            ->imageResizeMode('cover')
 //                            ->imageCropAspectRatio('1:1')
@@ -103,7 +133,8 @@ class CompanyResource extends Resource
                             ->maxLength(65535),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Company Values')
+                Forms\Components\Section::make(fn (callable $get) => static::getDynamicSectionLabel($get, 'Values'))
+                    ->collapsible()
                     ->schema([
                         Forms\Components\Textarea::make('vision')
                             ->rows(3)
@@ -115,14 +146,15 @@ class CompanyResource extends Resource
                             ->rows(3)
                             ->maxLength(65535),
                     ])->columns(1),
-                Forms\Components\Section::make('Media Files')
+                Forms\Components\Section::make(fn (callable $get) => static::getDynamicSectionLabel($get, 'Media Files'))
+                    ->collapsible()
                     ->schema([
                         Forms\Components\FileUpload::make('media_logos')
-                            ->label('Company Logos')
+                            ->label('Entity Logos')
                             ->multiple()
                             ->maxFiles(5)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'])
-                            ->directory('company-logos')
+                            ->directory('entity-logos')
                             ->visibility('public')
                             ->saveUploadedFileUsing(function ($file, $record) {
                                 if ($record) {
@@ -151,8 +183,8 @@ class CompanyResource extends Resource
                             }),
 
                         SpatieMediaLibraryFileUpload::make('media_photos')
-                            ->label('Company Photos')
-                            ->collection('company_photos')
+                            ->label('Entity Photos')
+                            ->collection('entity_photos')
                             ->multiple()
                             ->reorderable()
                             ->maxFiles(10)
@@ -166,11 +198,11 @@ class CompanyResource extends Resource
                             ->preserveFilenames(),
 
 //                        Forms\Components\FileUpload::make('media_photos')
-//                            ->label('Company Photos')
+//                            ->label('Entity Photos')
 //                            ->multiple()
 //                            ->maxFiles(10)
 //                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif'])
-//                            ->directory('company-photos')
+//                            ->directory('entity-photos')
 //                            ->visibility('public')
 //                            ->saveUploadedFileUsing(function ($file, $record) {
 //                                if ($record) {
@@ -199,11 +231,11 @@ class CompanyResource extends Resource
 //                            }),
 
                         Forms\Components\FileUpload::make('media_documents')
-                            ->label('Company Documents')
+                            ->label('Entity Documents')
                             ->multiple()
                             ->maxFiles(5)
                             ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
-                            ->directory('company-documents')
+                            ->directory('entity-documents')
                             ->visibility('public')
                             ->saveUploadedFileUsing(function ($file, $record) {
                                 if ($record) {
@@ -241,7 +273,7 @@ class CompanyResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('logo')
                     ->circular()
-                    ->defaultImageUrl(fn () => asset('images/default-company-logo.png'))
+                    ->defaultImageUrl(fn () => asset('images/default-entity-logo.png'))
                     ->label('Logo'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
@@ -257,7 +289,7 @@ class CompanyResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('website')
                     ->searchable()
-                    ->url(fn (Company $record): ?string => $record->website ? 'https://'.$record->website : null)
+                    ->url(fn (Entity $record): ?string => $record->website ? 'https://'.$record->website : null)
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
@@ -318,10 +350,10 @@ class CompanyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCompanies::route('/'),
-            'create' => Pages\CreateCompany::route('/create'),
-            'edit' => Pages\EditCompany::route('/{record}/edit'),
-            'view' => Pages\ViewCompany::route('/{record}'),
+            'index' => Pages\ListEntities::route('/'),
+            'create' => Pages\CreateEntity::route('/create'),
+            'edit' => Pages\EditEntity::route('/{record}/edit'),
+            'view' => Pages\ViewEntity::route('/{record}'),
         ];
     }
 

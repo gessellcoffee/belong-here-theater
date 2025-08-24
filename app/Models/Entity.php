@@ -6,19 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Company extends Model implements HasMedia
+class Entity extends Model implements HasMedia 
 {
     use InteractsWithMedia;
     use SoftDeletes;
+    use HasFactory;
 
-    protected $table = 'companies';
+    protected $table = 'entities';
 
     protected $fillable = [
         'user_id',
+        'entity_type_id',
         'name',
+        'slug',
         'description',
         'logo',
         'location_id',
@@ -42,6 +46,11 @@ class Company extends Model implements HasMedia
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function entity_type(): BelongsTo
+    {
+        return $this->belongsTo(EntityType::class);
     }
 
 }

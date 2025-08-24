@@ -29,15 +29,21 @@ class MediaFactory extends Factory
         $fileName = $this->faker->word().'.jpg';
 
         return [
-            'mediable_id' => User::factory(),
-            'mediable_type' => User::class,
+            'name' => $fileName,
             'file_name' => $fileName,
-            'file_path' => 'media/users/1/'.Str::slug($fileName).'_'.time().'.jpg',
             'mime_type' => 'image/jpeg',
             'disk' => 'public',
-            'file_size' => $this->faker->numberBetween(1000, 5000000),
             'collection_name' => $this->faker->randomElement(['avatars', 'documents', 'photos']),
             'custom_properties' => ['alt' => $this->faker->sentence()],
+            'model_type' => "App\Models\User",  
+            'model_id' => User::factory()->create()->id,
+            'size' => 1024,
+            'manipulations' => [],
+            'generated_conversions' => [],
+            'responsive_images' => [],
+            'uuid' => $this->faker->uuid(),
+            'conversions_disk' => null,
+            'order_column' => null,
         ];
     }
 

@@ -35,6 +35,7 @@ class LocationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Location Details')
+                    ->collapsible()
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()
@@ -212,4 +213,4 @@ class LocationResource extends Resource
             'edit' => Pages\EditLocation::route('/{record}/edit'),
         ];
     }
-}
+}   

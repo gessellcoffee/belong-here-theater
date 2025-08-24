@@ -2,22 +2,24 @@
 
 namespace Database\Factories;
 
-use App\Models\Company;
+use App\Models\Entity;
+use App\Models\EntityType;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Company>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Entity>
  */
-class CompanyFactory extends Factory
+class EntityFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Company::class;
+    protected $model = Entity::class;
 
     /**
      * Define the model's default state.
@@ -28,6 +30,8 @@ class CompanyFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
+            'slug' => $this->faker->slug(),
+            'entity_type_id' => EntityType::factory(),
             'description' => $this->faker->paragraph(),
             'logo' => null,
             'website' => $this->faker->url(),
@@ -38,7 +42,7 @@ class CompanyFactory extends Factory
             'mission' => $this->faker->paragraph(),
             'values' => $this->faker->paragraph(),
             'user_id' => User::factory(),
-            'locations_id' => Location::factory(),
-        ];
+            'location_id' => Location::factory(),
+        ];  
     }
 }

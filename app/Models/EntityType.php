@@ -3,28 +3,27 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Location extends Model 
+class EntityType extends Model
 {
-    use InteractsWithMedia;
-    use SoftDeletes;
     use HasFactory;
+    use SoftDeletes;
 
-    protected $table = 'locations';
+    protected $table = 'entity_types';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
         'name',
-        'address',
-        'city',
-        'state',
-        'zip',
-        'country',
-        'latitude',
-        'longitude',
+        'description',
+        'slug',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function entities(): HasMany

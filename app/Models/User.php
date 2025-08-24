@@ -50,8 +50,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function company(): HasOne
+    public function entity(): HasOne
     {
-        return $this->hasOne(Company::class);
+        return $this->hasOne(Entity::class);
     }
 }

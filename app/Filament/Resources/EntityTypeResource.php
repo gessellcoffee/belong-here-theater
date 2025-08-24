@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EventTypeResource\Pages;
-use App\Filament\Resources\EventTypeResource\RelationManagers;
-use App\Models\EventType;
+use App\Filament\Resources\EntityTypeResource\Pages;
+use App\Filament\Resources\EntityTypeResource\RelationManagers;
+use App\Models\EntityType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,28 +12,32 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\TextInput;
+use Filament\Tables\Columns\TextColumn;
 
-class EventTypeResource extends Resource
+class EntityTypeResource extends Resource
 {
-    protected static ?string $model = EventType::class;
-    protected static ?string $navigationGroup = 'Events';
+    protected static ?string $model = EntityType::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Entity Management';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Event Type Information')
+                Forms\Components\Section::make('Entity Type Information')
                     ->collapsible()
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('slug')
+                        TextInput::make('slug')
                             ->required()
-                            ->maxLength(255)
-                            ->unique(),
+                            ->maxLength(255),
+                        TextInput::make('description')
+                            ->required()
+                            ->maxLength(255),
                     ]),
             ]);
     }
@@ -42,21 +46,24 @@ class EventTypeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('slug')
+                TextColumn::make('slug')
+                    ->searchable(),
+                TextColumn::make('description')
                     ->searchable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('name'),
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                ])
             ]);
     }
 
@@ -69,9 +76,9 @@ class EventTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEventTypes::route('/'),
-            'create' => Pages\CreateEventType::route('/create'),
-            'edit' => Pages\EditEventType::route('/{record}/edit'),
+            'index' => Pages\ListEntityTypes::route('/'),
+            'create' => Pages\CreateEntityType::route('/create'),
+            'edit' => Pages\EditEntityType::route('/{record}/edit'),
         ];
     }
 }

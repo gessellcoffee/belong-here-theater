@@ -19,7 +19,7 @@ class Social extends Model
         'name',
         'url',
         'icon',
-        'company_id',
+        'entity_id',
         'user_id',
         'entity_type',
     ];
@@ -44,9 +44,9 @@ class Social extends Model
     /**
      * Get the company that owns the social link.
      */
-    public function company(): BelongsTo
+    public function entity(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Entity::class);
     }
 
     /**
@@ -58,10 +58,10 @@ class Social extends Model
     }
 
     /**
-     * Determine if the social link belongs to a company.
+     * Determine if the social link belongs to an entity.
      */
-    public function isCompanySocial(): bool
+    public function isEntitySocial(): bool
     {
-        return $this->entity_type === 'company';
+        return $this->entity_type === 'entity';
     }
 }
